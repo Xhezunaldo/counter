@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zählerstand Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Zählerstand Tracker</h1>
+    <p>Aktueller Zählerstand: <span id="counter">0</span></p>
+    
+    <button id="increaseBtn">Zähler erhöhen</button>
+    <button id="downloadBtn">Zählerstand herunterladen</button>
+
+    <script>
+        // Initialer Zählerstand aus dem localStorage holen (falls vorhanden)
+        let counter = JSON.parse(localStorage.getItem('counter')) || { count: 0, timestamps: [] };
+        
+        // Funktion, um den Zählerstand anzuzeigen
+        function updateCounter() {
+            document.getElementById('counter').textContent = counter.count;
+        }
+        
+        // Funktion zum Erhöhen des Zählerstandes
+        document.getElementById('increaseBtn').addEventListener('click', () => {
+            counter.count += 1;
+            counter.timestamps.push(new Date().toLocaleTimeString());
+            
+            // Zählerstand im localStorage speichern
+            localStorage.setItem('counter', JSON.stringify(counter));
+            updateCounter();
+        });
+
+        // Funktion zum Herunterladen des Zählerstandes als JSON-Datei
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const blob = new Blob([JSON.stringify(counter, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'counter-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Zählerstand beim Laden der Seite anzeigen
+        updateCounter();
+    </script>
+
+</body>
+</html>
