@@ -22,6 +22,7 @@
 
     <h1>Zählerstand Tracker</h1>
     <p>Aktueller Zählerstand: <span id="counter">0</span></p>
+    <p>Letzte Änderung: <span id="lastUpdated">Noch keine Änderung</span></p>
     
     <button id="increaseBtn">Zähler erhöhen</button>
     <button id="downloadBtn">Zählerstand herunterladen</button>
@@ -29,16 +30,25 @@
     <script>
         // Initialer Zählerstand aus dem localStorage holen (falls vorhanden)
         let counter = JSON.parse(localStorage.getItem('counter')) || { count: 0, timestamps: [] };
-        
+
         // Funktion, um den Zählerstand anzuzeigen
         function updateCounter() {
             document.getElementById('counter').textContent = counter.count;
+            if (counter.timestamps.length > 0) {
+                const lastTimestamp = counter.timestamps[counter.timestamps.length - 1];
+                document.getElementById('lastUpdated').textContent = lastTimestamp.date + " um " + lastTimestamp.time;
+            }
         }
         
         // Funktion zum Erhöhen des Zählerstandes
         document.getElementById('increaseBtn').addEventListener('click', () => {
             counter.count += 1;
-            counter.timestamps.push(new Date().toLocaleTimeString());
+            const now = new Date();
+            const timestamp = {
+                date: now.toISOString().split('T')[0],  // Datum im Format YYYY-MM-DD
+                time: now.toLocaleTimeString()          // Uhrzeit
+            };
+            counter.timestamps.push(timestamp);
             
             // Zählerstand im localStorage speichern
             localStorage.setItem('counter', JSON.stringify(counter));
